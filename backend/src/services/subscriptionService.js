@@ -69,3 +69,14 @@ export async function unsubscribe(token) {
   );
   return result.rows.length > 0;
 }
+
+export async function getSubscriptionsByEmail(email) {
+  const result = await pool.query(
+    `SELECT s.email, r.owner || '/' || r.repo AS repo, s.confirmed, r.last_seen_tag
+     FROM subscriptions s
+     JOIN repositories r ON s.repository_id = r.id
+     WHERE s.email = $1`,
+    [email]
+  );
+  return result.rows;
+}

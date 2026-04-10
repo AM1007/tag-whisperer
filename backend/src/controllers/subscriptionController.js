@@ -3,7 +3,8 @@ import { checkRepoExists } from '../services/githubService.js';
 import { 
   createSubscription, 
   confirmSubscription, 
-  unsubscribe as unsubscribeService 
+  unsubscribe as unsubscribeService,
+  getSubscriptionsByEmail 
 } from '../services/subscriptionService.js';
 
 
@@ -78,6 +79,22 @@ export async function unsubscribeHandler(req, res) {
     return res.status(200).json({ message: 'Unsubscribed successfully' });
   } catch (err) {
     console.error('Unsubscribe error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export async function getSubscriptions(req, res) {
+  const { email } = req.query;
+
+  if (!email || !isValidEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email' });
+  }
+
+  try {
+    const subscriptions = await getSubscriptionsByEmail(email);
+    return res.status(200).json(subscriptions);
+  } catch (err) {
+    console.error('Get subscriptions error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
