@@ -1,6 +1,11 @@
 import { isValidEmail, isValidRepo, parseRepo } from '../utils/validation.js';
 import { checkRepoExists } from '../services/githubService.js';
-import { createSubscription } from '../services/subscriptionService.js';
+import { 
+  createSubscription, 
+  confirmSubscription, 
+  unsubscribe as unsubscribeService 
+} from '../services/subscriptionService.js';
+
 
 export async function subscribe(req, res) {
   const { email, repo } = req.body;
@@ -31,6 +36,48 @@ export async function subscribe(req, res) {
       return res.status(429).json({ error: 'Rate limit exceeded. Try later.' });
     }
     console.error('Subscribe error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export async function confirm(req, res) {
+  const { token } = req.params;
+
+  if (!token) {
+    return res.status(400).json({ error: 'Invalid token' });
+  }
+
+  try {
+    const found = await confirmSubscription(token);
+
+    if (!found) {
+      return res.status(404).json({ error: 'Token not found' });
+    }
+
+    return res.status(200).json({ message: 'Subscription confirmed successfully' });
+  } catch (err) {
+    console.error('Confirm error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+export async function unsubscribeHandler(req, res) {
+  const { token } = req.params;
+
+  if (!token) {
+    return res.status(400).json({ error: 'Invalid token' });
+  }
+
+  try {
+    const found = await unsubscribeService(token);
+
+    if (!found) {
+      return res.status(404).json({ error: 'Token not found' });
+    }
+
+    return res.status(200).json({ message: 'Unsubscribed successfully' });
+  } catch (err) {
+    console.error('Unsubscribe error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -53,3 +53,19 @@ export async function createSubscription(email, owner, repo) {
     client.release();
   }
 }
+
+export async function confirmSubscription(token) {
+  const result = await pool.query(
+    'UPDATE subscriptions SET confirmed = TRUE WHERE confirm_token = $1 AND confirmed = FALSE RETURNING id',
+    [token]
+  );
+  return result.rows.length > 0;
+}
+
+export async function unsubscribe(token) {
+  const result = await pool.query(
+    'DELETE FROM subscriptions WHERE unsubscribe_token = $1 RETURNING id',
+    [token]
+  );
+  return result.rows.length > 0;
+}
