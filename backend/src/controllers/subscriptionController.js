@@ -46,6 +46,7 @@ export async function confirm(req, res) {
   const { token } = req.params;
 
   if (!token) {
+    if (req.accepts('html')) return res.redirect('/resultpage.html?status=error');
     return res.status(400).json({ error: 'Invalid token' });
   }
 
@@ -53,9 +54,11 @@ export async function confirm(req, res) {
     const found = await confirmSubscription(token);
 
     if (!found) {
+      if (req.accepts('html')) return res.redirect('/resultpage.html?status=error');
       return res.status(404).json({ error: 'Token not found' });
     }
 
+    if (req.accepts('html')) return res.redirect('/resultpage.html?status=success');
     return res.status(200).json({ message: 'Subscription confirmed successfully' });
   } catch (err) {
     console.error('Confirm error:', err);
@@ -67,6 +70,7 @@ export async function unsubscribeHandler(req, res) {
   const { token } = req.params;
 
   if (!token) {
+    if (req.accepts('html')) return res.redirect('/resultpage.html?status=error');
     return res.status(400).json({ error: 'Invalid token' });
   }
 
@@ -74,9 +78,11 @@ export async function unsubscribeHandler(req, res) {
     const found = await unsubscribeService(token);
 
     if (!found) {
+      if (req.accepts('html')) return res.redirect('/resultpage.html?status=error');
       return res.status(404).json({ error: 'Token not found' });
     }
 
+    if (req.accepts('html')) return res.redirect('/resultpage.html?status=unsubscribe');
     return res.status(200).json({ message: 'Unsubscribed successfully' });
   } catch (err) {
     console.error('Unsubscribe error:', err);

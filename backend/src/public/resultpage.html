@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status &mdash; Tag Whisperer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .premium-shadow {
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 10px 15px -3px rgba(0, 0, 0, 0.3),
+                0 25px 30px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Staggered Entrance Animations */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(12px);
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* SVG Path Drawing Animation */
+        .draw-stroke path {
+            stroke-dasharray: 40;
+            stroke-dashoffset: 40;
+            animation: draw 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 150ms;
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .draw-stroke path {
+                stroke-dashoffset: 0 !important;
+            }
+            .animate-in {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#0b0e14] text-slate-300 min-h-screen flex items-center justify-center p-4 sm:p-6 selection:bg-blue-500/30 selection:text-white relative overflow-hidden">
+    
+    <!-- Background Effects matching index.html -->
+    <div class="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        <div class="absolute w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] opacity-40 translate-y-[-10%]"></div>
+        <div class="absolute w-[800px] h-[600px] bg-[#0b0e14] opacity-80 mix-blend-overlay"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPC9zdmc+')] opacity-20"></div>
+    </div>
+
+    <!-- Main Card Component -->
+    <main role="alert" aria-live="polite" class="w-full max-w-[520px] bg-[#11151e]/80 backdrop-blur-2xl rounded-[24px] premium-shadow relative z-10 overflow-hidden transform-gpu transition-all">
+        
+        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+        <div class="p-8 sm:p-10 flex flex-col items-center justify-center text-center">
+            
+            <!-- Dynamic Status Icon -->
+            <div id="icon-container" class="w-16 h-16 rounded-full border flex items-center justify-center mb-6 relative animate-in">
+                <div id="icon-glow" class="absolute inset-0 rounded-full border"></div>
+                <svg id="status-icon" class="w-8 h-8 draw-stroke" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Path injected via JS -->
+                </svg>
+            </div>
+            
+            <!-- Typography block -->
+            <div class="mb-10 space-y-3">
+                <h1 id="status-title" class="text-2xl sm:text-3xl font-medium tracking-tight text-white animate-in delay-100">
+                    <!-- Title injected via JS -->
+                </h1>
+                <p id="status-message" class="text-sm text-slate-400 leading-relaxed max-w-[320px] mx-auto animate-in delay-200">
+                    <!-- Message injected via JS -->
+                </p>
+                <p id="status-context" class="text-xs text-slate-500 flex items-center justify-center gap-1.5 pt-2 animate-in delay-300">
+                    <iconify-icon id="context-icon" width="14"></iconify-icon>
+                    <span id="context-text"></span>
+                </p>
+            </div>
+            
+            <!-- Primary Action -->
+            <div class="w-full max-w-[280px] animate-in delay-400">
+                <a 
+                    id="action-btn"
+                    href="/" 
+                    class="w-full relative group overflow-hidden bg-white text-black font-medium rounded-xl py-3 px-4 text-sm transition-all hover:bg-slate-200 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-white/[0.1] flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]"
+                >
+                    <span class="flex items-center gap-2">
+                        <span id="btn-text"></span>
+                        <iconify-icon id="btn-icon" width="16" class="transition-transform"></iconify-icon>
+                    </span>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <p class="absolute bottom-6 inset-x-0 text-center text-xs text-slate-600 pointer-events-none">
+        Built for developers who prefer signal over noise.
+    </p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Detect status from URL (e.g. ?status=success)
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status') || 'success'; 
+
+            // State Configurations
+            const config = {
+                success: {
+                    iconPath: '<path d="M5 13l4 4L19 7" />',
+                    iconColor: 'text-blue-400',
+                    containerClass: 'bg-blue-500/10 border-blue-500/20',
+                    glowClass: 'border-blue-400/20 animate-[ping_3s_ease-in-out_infinite]',
+                    title: 'Subscription confirmed',
+                    message: 'We’ll notify you when a new release is published.',
+                    contextIcon: 'solar:shield-check-linear',
+                    contextText: 'You can close this page safely.',
+                    btnText: 'Back to dashboard',
+                    btnIcon: 'solar:home-linear',
+                    btnHoverHover: 'group-hover:scale-110'
+                },
+                unsubscribe: {
+                    iconPath: '<path d="M8 12h8" />',
+                    iconColor: 'text-slate-300',
+                    containerClass: 'bg-white/[0.03] border-white/10',
+                    glowClass: 'border-white/5',
+                    title: 'You’re unsubscribed',
+                    message: 'You will no longer receive release notifications.',
+                    contextIcon: 'solar:info-circle-linear',
+                    contextText: 'It was great having you.',
+                    btnText: 'Track another repository',
+                    btnIcon: 'solar:add-circle-linear',
+                    btnHoverHover: 'group-hover:rotate-90'
+                },
+                error: {
+                    iconPath: '<path d="M6 18L18 6M6 6l12 12" />',
+                    iconColor: 'text-red-400',
+                    containerClass: 'bg-red-500/10 border-red-500/20',
+                    glowClass: 'border-red-400/20 opacity-60',
+                    title: 'Something went wrong',
+                    message: 'This confirmation link is invalid or has expired.',
+                    contextIcon: 'solar:danger-circle-linear',
+                    contextText: 'Please request a new link.',
+                    btnText: 'Go back',
+                    btnIcon: 'solar:arrow-left-linear',
+                    btnHoverHover: 'group-hover:-translate-x-0.5'
+                }
+            };
+
+            // Resolve state fallback
+            const state = config[status] || config.error;
+
+            // DOM Elements Mapping
+            const el = {
+                iconContainer: document.getElementById('icon-container'),
+                iconGlow: document.getElementById('icon-glow'),
+                statusIcon: document.getElementById('status-icon'),
+                statusTitle: document.getElementById('status-title'),
+                statusMessage: document.getElementById('status-message'),
+                contextIcon: document.getElementById('context-icon'),
+                contextText: document.getElementById('context-text'),
+                btnText: document.getElementById('btn-text'),
+                btnIcon: document.getElementById('btn-icon')
+            };
+
+            // Inject Data & Styles
+            el.statusIcon.innerHTML = state.iconPath;
+            el.statusIcon.className += ` ${state.iconColor}`;
+            
+            el.iconContainer.className += ` ${state.containerClass}`;
+            el.iconGlow.className += ` ${state.glowClass}`;
+            
+            el.statusTitle.textContent = state.title;
+            el.statusMessage.textContent = state.message;
+            
+            el.contextIcon.setAttribute('icon', state.contextIcon);
+            el.contextText.textContent = state.contextText;
+            
+            el.btnText.textContent = state.btnText;
+            el.btnIcon.setAttribute('icon', state.btnIcon);
+            el.btnIcon.className += ` ${state.btnHoverHover}`;
+        });
+    </script>
+</body>
+</html>
