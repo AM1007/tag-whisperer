@@ -80,3 +80,30 @@ export async function getSubscriptionsByEmail(email) {
   );
   return result.rows;
 }
+
+export async function getActiveRepositories() {
+  const result = await pool.query(
+    `SELECT DISTINCT r.id, r.owner, r.repo, r.last_seen_tag
+     FROM repositories r
+     JOIN subscriptions s ON s.repository_id = r.id
+     WHERE s.confirmed = TRUE`
+  );
+  return result.rows;
+}
+
+export async function updateLastSeenTag(repoId, tag) {
+  await pool.query(
+    'UPDATE repositories SET last_seen_tag = $1 WHERE id = $2',
+    [tag, repoId]
+  );
+}
+
+export async function getSubscribersForRepo(repoId) {
+  const result = await pool.query(
+    `SELECT email, unsubscribe_token
+     FROM subscriptions
+     WHERE repository_id = $1 AND confirmed = TRUE`,
+    [repoId]
+  );
+  return result.rows;
+}
