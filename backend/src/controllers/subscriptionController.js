@@ -6,6 +6,7 @@ import {
   unsubscribe as unsubscribeService,
   getSubscriptionsByEmail 
 } from '../services/subscriptionService.js';
+import { sendConfirmationEmail } from '../services/emailService.js';
 
 
 export async function subscribe(req, res) {
@@ -29,7 +30,7 @@ export async function subscribe(req, res) {
       return res.status(409).json({ error: 'Already subscribed' });
     }
 
-    // TODO: отправить confirmation email (следующий шаг)
+    await sendConfirmationEmail(email, repo, result.confirmToken);
 
     return res.status(200).json({ message: 'Subscription successful. Confirmation email sent.' });
   } catch (err) {
