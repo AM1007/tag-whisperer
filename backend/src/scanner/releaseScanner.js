@@ -5,9 +5,11 @@ import {
   getSubscribersForRepo,
 } from '../services/subscriptionService.js';
 import { sendReleaseNotification } from '../services/emailService.js';
+import { scannerRuns, activeSubscriptions } from '../config/metrics.js';
 
 export async function scanReleases() {
   console.log('[Scanner] Starting release check...');
+  scannerRuns.inc({ status: 'started' });
 
   let repos;
   try {
@@ -18,6 +20,7 @@ export async function scanReleases() {
   }
 
   console.log(`[Scanner] Checking ${repos.length} repositories`);
+  activeSubscriptions.set(repos.length);
 
   for (const repo of repos) {
     try {
@@ -61,5 +64,6 @@ export async function scanReleases() {
     }
   }
 
+  scannerRuns.inc({ status: 'completed' });
   console.log('[Scanner] Scan complete');
 }
