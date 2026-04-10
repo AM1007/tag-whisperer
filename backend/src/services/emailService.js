@@ -15,7 +15,7 @@ export async function sendConfirmationEmail(email, repo, confirmToken) {
   const confirmUrl = `${BASE_URL}/api/confirm/${confirmToken}`;
 
   await transporter.sendMail({
-    from: '"Tag Whisperer" <noreply@tagwhisperer.dev>',
+    from: '"Tag Whisperer" <omisoft.github@gmail.com>',
     to: email,
     subject: `Confirm your subscription to ${repo}`,
     html: `
@@ -31,7 +31,7 @@ export async function sendReleaseNotification(email, repo, tag, unsubscribeToken
   const unsubscribeUrl = `${BASE_URL}/api/unsubscribe/${unsubscribeToken}`;
 
   await transporter.sendMail({
-    from: '"Tag Whisperer" <noreply@tagwhisperer.dev>',
+    from: '"Tag Whisperer" <omisoft.github@gmail.com>',
     to: email,
     subject: `New release: ${repo} ${tag}`,
     html: `
