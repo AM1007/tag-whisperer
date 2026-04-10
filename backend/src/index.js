@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { runMigrations } from './db/migrate.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import { scanReleases } from './scanner/releaseScanner.js';
@@ -10,6 +12,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(join(__dirname, 'public')));
 app.use(metricsMiddleware);
 app.use('/api', subscriptionRoutes);
 

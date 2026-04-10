@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tag Whisperer &mdash; Track GitHub Releases</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #131823 inset !important;
+            -webkit-text-fill-color: #f8fafc !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .premium-shadow {
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 10px 15px -3px rgba(0, 0, 0, 0.3),
+                0 25px 30px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#0b0e14] text-slate-300 min-h-screen flex items-center justify-center p-4 sm:p-6 selection:bg-blue-500/30 selection:text-white relative overflow-hidden">
+    
+    <div class="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        <div class="absolute w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] opacity-40 translate-y-[-10%]"></div>
+        <div class="absolute w-[800px] h-[600px] bg-[#0b0e14] opacity-80 mix-blend-overlay"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPC9zdmc+')] opacity-20"></div>
+    </div>
+
+    <main class="w-full max-w-[520px] bg-[#11151e]/80 backdrop-blur-2xl rounded-[24px] premium-shadow relative z-10 overflow-hidden transform-gpu transition-all">
+
+        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+        <div class="grid grid-cols-1 grid-rows-1">
+            
+            <div id="form-view" class="col-start-1 row-start-1 z-10 transition-all duration-500 ease-out opacity-100 translate-y-0 p-8 sm:p-10 flex flex-col">
+                
+                <div class="flex items-center gap-2.5 mb-6">
+                    <div class="w-7 h-7 rounded flex items-center justify-center bg-white/[0.03] border border-white/10 shadow-sm">
+                        <iconify-icon icon="solar:tag-linear" width="16" class="text-slate-300"></iconify-icon>
+                    </div>
+                    <span class="text-sm font-medium tracking-tight text-white">Tag Whisperer</span>
+                    <span class="ml-auto text-xs tracking-wider text-slate-500 font-medium px-2.5 py-1 rounded-full bg-white/[0.02] border border-white/5 uppercase">Beta</span>
+                </div>
+
+                <div class="mb-8 space-y-3">
+                    <h1 class="text-2xl sm:text-3xl font-medium tracking-tight text-white">Track releases<br/>without the noise.</h1>
+                    <p class="text-sm text-slate-400 leading-relaxed">Get a clean email the moment your selected GitHub repository ships a new release.</p>
+                    <p class="text-xs text-slate-500 flex items-center gap-1.5 pt-1">
+                        <iconify-icon icon="solar:shield-check-linear" width="14"></iconify-icon>
+                        One repo at a time. No spam. Confirm by email.
+                    </p>
+                </div>
+
+                <div id="api-error" class="hidden mb-6 rounded-xl bg-red-500/[0.05] border border-red-500/20 p-3.5 flex items-start gap-3 transition-all" aria-live="polite">
+                    <iconify-icon icon="solar:danger-circle-linear" width="18" class="text-red-400 mt-0.5 shrink-0"></iconify-icon>
+                    <p id="api-error-text" class="text-sm text-red-300 leading-relaxed"></p>
+                </div>
+
+                <form id="subscribe-form" class="space-y-5 relative" novalidate>
+                    
+                    <div class="space-y-1.5 relative group">
+                        <label for="repo" class="text-xs font-medium text-slate-400 ml-1 transition-colors group-focus-within:text-slate-200 block cursor-pointer">Repository</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 transition-colors group-focus-within:text-white">
+                                <iconify-icon icon="solar:folder-with-files-linear" width="18"></iconify-icon>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="repo" 
+                                autocomplete="off" 
+                                spellcheck="false" 
+                                placeholder="owner/repo" 
+                                class="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-white/20 focus:bg-white/[0.04] transition-all focus:ring-4 focus:ring-white/[0.02] shadow-inner"
+                                aria-describedby="repo-feedback"
+                            >
+                        </div>
+                        <div id="repo-feedback" class="min-h-[20px] ml-1 mt-1 flex items-center" aria-live="polite">
+                            <p id="repo-help" class="text-xs text-slate-500 transition-opacity">Use owner/repo format</p>
+                            <p id="repo-error" class="text-xs text-red-400 hidden flex items-center gap-1.5">
+                                <iconify-icon icon="solar:info-circle-linear" width="14"></iconify-icon>
+                                <span class="error-msg"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 relative group">
+                        <label for="email" class="text-xs font-medium text-slate-400 ml-1 transition-colors group-focus-within:text-slate-200 block cursor-pointer">Email address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 transition-colors group-focus-within:text-white">
+                                <iconify-icon icon="solar:letter-linear" width="18"></iconify-icon>
+                            </div>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                autocomplete="email" 
+                                placeholder="you@example.com" 
+                                class="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-white/20 focus:bg-white/[0.04] transition-all focus:ring-4 focus:ring-white/[0.02] shadow-inner"
+                                aria-describedby="email-feedback"
+                            >
+                        </div>
+                        <div id="email-feedback" class="min-h-[20px] ml-1 mt-1 flex items-center" aria-live="polite">
+                            <p id="email-error" class="text-xs text-red-400 hidden flex items-center gap-1.5">
+                                <iconify-icon icon="solar:info-circle-linear" width="14"></iconify-icon>
+                                <span class="error-msg"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button 
+                            type="submit" 
+                            id="submit-btn" 
+                            class="w-full relative group overflow-hidden bg-white text-black font-medium rounded-xl py-3 px-4 text-sm transition-all hover:bg-slate-200 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 disabled:cursor-not-allowed flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]"
+                        >
+                            <span id="submit-text" class="flex items-center gap-2 transition-opacity duration-200">
+                                Start tracking
+                                <iconify-icon icon="solar:arrow-right-linear" width="16" class="transition-transform group-hover:translate-x-0.5"></iconify-icon>
+                            </span>
+                            <span id="submit-loading" class="absolute inset-0 flex items-center justify-center gap-2 opacity-0 pointer-events-none transition-opacity duration-200 bg-inherit text-inherit">
+                                <iconify-icon icon="solar:spinner-linear" width="18" class="animate-spin"></iconify-icon>
+                                Starting...
+                            </span>
+                        </button>
+                        <p class="text-xs text-center text-slate-500 mt-5">You’ll receive a confirmation email before notifications begin.</p>
+                    </div>
+                </form>
+            </div>
+
+            <div id="success-view" class="col-start-1 row-start-1 z-0 transition-all duration-500 ease-out opacity-0 translate-y-4 pointer-events-none p-8 sm:p-10 flex flex-col items-center justify-center text-center">
+                
+                <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 relative">
+                    <div class="absolute inset-0 rounded-full border border-blue-400/20 animate-[ping_3s_ease-in-out_infinite]"></div>
+                    <iconify-icon icon="solar:check-circle-linear" width="32" class="text-blue-400"></iconify-icon>
+                </div>
+                
+                <h2 class="text-2xl font-medium tracking-tight text-white mb-3">Check your inbox</h2>
+                <p class="text-sm text-slate-400 mb-10 leading-relaxed max-w-[300px] mx-auto">
+                    We’ve sent a confirmation email. Open it to activate release tracking for <br/>
+                    <span id="success-repo-name" class="text-slate-200 font-medium mt-1 inline-block"></span>.
+                </p>
+                
+                <button id="reset-btn" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2 border border-white/10 rounded-xl px-5 py-2.5 hover:bg-white/[0.03] active:scale-[0.98]">
+                    <iconify-icon icon="solar:refresh-linear" width="16"></iconify-icon>
+                    Track another repository
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <p class="absolute bottom-6 inset-x-0 text-center text-xs text-slate-600 pointer-events-none">
+        Built for developers who prefer signal over noise.
+    </p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('subscribe-form');
+            const repoInput = document.getElementById('repo');
+            const emailInput = document.getElementById('email');
+            
+            const repoErrorContainer = document.getElementById('repo-error');
+            const repoErrorMsg = repoErrorContainer.querySelector('.error-msg');
+            const repoHelp = document.getElementById('repo-help');
+            
+            const emailErrorContainer = document.getElementById('email-error');
+            const emailErrorMsg = emailErrorContainer.querySelector('.error-msg');
+            
+            const apiError = document.getElementById('api-error');
+            const apiErrorText = document.getElementById('api-error-text');
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const submitLoading = document.getElementById('submit-loading');
+            
+            const formView = document.getElementById('form-view');
+            const successView = document.getElementById('success-view');
+            const successRepoName = document.getElementById('success-repo-name');
+            const resetBtn = document.getElementById('reset-btn');
+
+            const REPO_REGEX = /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/;
+            const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (window.innerWidth > 768) {
+                setTimeout(() => repoInput.focus(), 100);
+            }
+
+            const showSuccessView = (repoName) => {
+                successRepoName.textContent = repoName;
+                
+                formView.classList.remove('opacity-100', 'translate-y-0', 'z-10');
+                formView.classList.add('opacity-0', '-translate-y-4', 'pointer-events-none', 'z-0');
+                
+                successView.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none', 'z-0');
+                successView.classList.add('opacity-100', 'translate-y-0', 'z-10', 'pointer-events-auto');
+            };
+
+            const showFormView = () => {
+                successView.classList.remove('opacity-100', 'translate-y-0', 'z-10', 'pointer-events-auto');
+                successView.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none', 'z-0');
+                
+                formView.classList.remove('opacity-0', '-translate-y-4', 'pointer-events-none', 'z-0');
+                formView.classList.add('opacity-100', 'translate-y-0', 'z-10');
+                
+                repoInput.value = '';
+                repoInput.focus();
+            };
+
+            const setInputState = (input, isError) => {
+                if (isError) {
+                    input.classList.remove('border-white/10', 'focus:border-white/20', 'bg-white/[0.02]');
+                    input.classList.add('border-red-500/40', 'focus:border-red-500/60', 'bg-red-500/[0.02]');
+                } else {
+                    input.classList.add('border-white/10', 'focus:border-white/20', 'bg-white/[0.02]');
+                    input.classList.remove('border-red-500/40', 'focus:border-red-500/60', 'bg-red-500/[0.02]');
+                }
+            };
+
+            const displayFieldError = (input, container, msgElement, helpElement, message) => {
+                setInputState(input, true);
+                msgElement.textContent = message;
+                container.classList.remove('hidden');
+                if (helpElement) helpElement.classList.add('hidden');
+            };
+
+            const clearFieldError = (input, container, helpElement) => {
+                setInputState(input, false);
+                container.classList.add('hidden');
+                if (helpElement) helpElement.classList.remove('hidden');
+            };
+
+            const clearApiError = () => {
+                apiError.classList.add('hidden');
+            };
+
+            repoInput.addEventListener('input', () => {
+                clearFieldError(repoInput, repoErrorContainer, repoHelp);
+                clearApiError();
+            });
+
+            emailInput.addEventListener('input', () => {
+                clearFieldError(emailInput, emailErrorContainer, null);
+                clearApiError();
+            });
+
+            const validateForm = () => {
+                let isValid = true;
+                const repoVal = repoInput.value.trim();
+                const emailVal = emailInput.value.trim();
+
+                if (!repoVal) {
+                    displayFieldError(repoInput, repoErrorContainer, repoErrorMsg, repoHelp, 'Enter a repository');
+                    isValid = false;
+                } else if (!REPO_REGEX.test(repoVal)) {
+                    displayFieldError(repoInput, repoErrorContainer, repoErrorMsg, repoHelp, 'Use owner/repo format');
+                    isValid = false;
+                }
+
+                if (!emailVal) {
+                    displayFieldError(emailInput, emailErrorContainer, emailErrorMsg, null, 'Enter your email');
+                    isValid = false;
+                } else if (!EMAIL_REGEX.test(emailVal)) {
+                    displayFieldError(emailInput, emailErrorContainer, emailErrorMsg, null, 'Enter a valid email');
+                    isValid = false;
+                }
+
+                return isValid;
+            };
+
+            const setLoading = (isLoading) => {
+                submitBtn.disabled = isLoading;
+                if (isLoading) {
+                    submitText.classList.add('opacity-0');
+                    submitLoading.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    submitText.classList.remove('opacity-0');
+                    submitLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            };
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearApiError();
+
+                if (!validateForm()) return;
+
+                const repoVal = repoInput.value.trim();
+                const emailVal = emailInput.value.trim();
+
+                setLoading(true);
+
+                try {
+                    const response = await fetch('/api/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: emailVal, repo: repoVal })
+                    });
+
+                    if (response.ok) {
+                        showSuccessView(repoVal);
+                    } else {
+                        apiError.classList.remove('hidden');
+                        switch (response.status) {
+                            case 400:
+                                apiErrorText.textContent = "Invalid input detected. Please verify your details.";
+                                break;
+                            case 404:
+                                apiErrorText.textContent = "Repository not found on GitHub. Check the spelling.";
+                                setInputState(repoInput, true);
+                                repoInput.focus();
+                                break;
+                            case 409:
+                                apiErrorText.textContent = "This email is already subscribed to that repository.";
+                                break;
+                            default:
+                                apiErrorText.textContent = "An unexpected error occurred. Please try again later.";
+                        }
+                    }
+                } catch (error) {
+                    apiError.classList.remove('hidden');
+                    apiErrorText.textContent = "Network error. Please check your connection and try again.";
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            resetBtn.addEventListener('click', showFormView);
+        });
+    </script>
+</body>
+</html>
