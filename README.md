@@ -1,6 +1,6 @@
 # Tag Whisperer
 
-**GitHub Release Notification API** — subscribe to email alerts when your favorite repositories ship new versions.
+**GitHub Release Notification API** – subscribe to email alerts when your favorite repositories ship new versions.
 
 🔗 **Live demo:** [tag-whisperer.onrender.com](https://tag-whisperer.onrender.com)
 
@@ -10,7 +10,7 @@
 
 ## What it does
 
-Tag Whisperer monitors GitHub repositories for new releases and sends email notifications to subscribers. The entire flow — subscribing, confirming via email, scanning for releases, and notifying — runs as a single monolithic service.
+Tag Whisperer monitors GitHub repositories for new releases and sends email notifications to subscribers. The entire flow – subscribing, confirming via email, scanning for releases, and notifying – runs as a single monolithic service.
 
 **User flow:**
 
@@ -24,16 +24,16 @@ Tag Whisperer monitors GitHub repositories for new releases and sends email noti
 
 ## API Endpoints
 
-Built to match the [Swagger specification](https://mykhailo-hrynko.github.io/se-school/task/swagger.yaml) — no contract modifications.
+Built to match the [Swagger specification](https://mykhailo-hrynko.github.io/se-school/task/swagger.yaml) – no contract modifications.
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/api/subscribe` | Subscribe to release notifications | API Key |
-| `GET` | `/api/confirm/{token}` | Confirm subscription via email link | — |
-| `GET` | `/api/unsubscribe/{token}` | Unsubscribe via email link | — |
+| `GET` | `/api/confirm/{token}` | Confirm subscription via email link | – |
+| `GET` | `/api/unsubscribe/{token}` | Unsubscribe via email link | – |
 | `GET` | `/api/subscriptions?email={email}` | List active subscriptions | API Key |
-| `GET` | `/health` | Health check | — |
-| `GET` | `/metrics` | Prometheus metrics | — |
+| `GET` | `/health` | Health check | – |
+| `GET` | `/metrics` | Prometheus metrics | – |
 
 ### Request & Response Examples
 
@@ -81,11 +81,11 @@ curl -H "X-API-Key: your-key" \
 
 **Key design decisions:**
 
-- **Repositories table separated from subscriptions** — one repo is scanned once for all its subscribers, avoiding redundant GitHub API calls
+- **Repositories table separated from subscriptions** – one repo is scanned once for all its subscribers, avoiding redundant GitHub API calls
 - **Redis caching** with 10-minute TTL on all GitHub API responses reduces rate limit consumption
-- **Graceful degradation** — if Redis is unavailable, the service continues without caching
-- **Scanner stops on 429** — when rate-limited, the entire scan halts instead of burning remaining quota
-- **Transactions** in subscription creation — repo lookup + subscription insert are atomic
+- **Graceful degradation** – if Redis is unavailable, the service continues without caching
+- **Scanner stops on 429** – when rate-limited, the entire scan halts instead of burning remaining quota
+- **Transactions** in subscription creation – repo lookup + subscription insert are atomic
 
 ---
 
@@ -193,7 +193,7 @@ Real emails delivered via Gmail SMTP. Confirmation and release notification temp
 
 ### Confirmation & Unsubscribe Pages
 
-Browser users see styled HTML pages instead of raw JSON. API consumers (curl, Postman) still receive JSON — the server checks the `Accept` header.
+Browser users see styled HTML pages instead of raw JSON. API consumers (curl, Postman) still receive JSON – the server checks the `Accept` header.
 
 | Confirmed | Unsubscribed | Error |
 |-----------|-------------|-------|
@@ -207,23 +207,23 @@ All GitHub API responses are cached with a 10-minute TTL, reducing rate limit us
 
 ### API Key Authentication
 
-Protected endpoints require an `X-API-Key` header. Authentication is optional — when `API_KEY` is not set, all endpoints are publicly accessible. Confirm and unsubscribe endpoints are always open (users click links from email).
+Protected endpoints require an `X-API-Key` header. Authentication is optional – when `API_KEY` is not set, all endpoints are publicly accessible. Confirm and unsubscribe endpoints are always open (users click links from email).
 
 ### Prometheus Metrics
 
 `GET /metrics` exposes:
 
-- `http_requests_total` — counter by method, route, status
-- `http_request_duration_seconds` — histogram by method, route
-- `active_subscriptions_total` — gauge of monitored repositories
-- `scanner_runs_total` — counter by status (started/completed)
+- `http_requests_total` – counter by method, route, status
+- `http_request_duration_seconds` – histogram by method, route
+- `active_subscriptions_total` – gauge of monitored repositories
+- `scanner_runs_total` – counter by status (started/completed)
 - Default Node.js metrics (CPU, memory, event loop, GC)
 
 ![Prometheus Metrics](docs/screenshots/12-prometheus-metrics.png)
 
 ### Release Scanner
 
-Runs every 10 minutes via `setInterval`. Checks only repositories with confirmed subscriptions. Compares `tag_name` from GitHub's latest release API against `last_seen_tag` in the database. On mismatch — notifies all subscribers and updates the tag.
+Runs every 10 minutes via `setInterval`. Checks only repositories with confirmed subscriptions. Compares `tag_name` from GitHub's latest release API against `last_seen_tag` in the database. On mismatch – notifies all subscribers and updates the tag.
 
 Rate limit handling: on HTTP 429, the scanner stops immediately and resumes at the next interval.
 
@@ -284,9 +284,9 @@ tag-whisperer/
 
 Hosted on [Render](https://render.com) (free tier) with:
 
-- **Database:** [Neon](https://neon.tech) — serverless PostgreSQL, fast cold start
-- **Cache:** [Upstash](https://upstash.com) — serverless Redis with TLS
-- **Monitoring:** [UptimeRobot](https://uptimerobot.com) — pings `/health` every 5 minutes to prevent cold starts
+- **Database:** [Neon](https://neon.tech) – serverless PostgreSQL, fast cold start
+- **Cache:** [Upstash](https://upstash.com) – serverless Redis with TLS
+- **Monitoring:** [UptimeRobot](https://uptimerobot.com) – pings `/health` every 5 minutes to prevent cold starts
 
 ---
 
