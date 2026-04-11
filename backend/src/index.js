@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { runMigrations } from './db/migrate.js';
@@ -14,6 +16,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(join(__dirname, 'public')));
+const swaggerDocument = YAML.load(join(__dirname, 'swagger.yaml'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.use(metricsMiddleware);
 app.use('/api', subscriptionRoutes);
 
