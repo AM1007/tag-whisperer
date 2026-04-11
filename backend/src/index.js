@@ -9,6 +9,7 @@ import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import { scanReleases } from './scanner/releaseScanner.js';
 import { registry } from './config/metrics.js';
 import { metricsMiddleware } from './middleware/metricsMiddleware.js';
+import { startGrpcServer } from './grpc/grpcServer.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ async function start() {
   const SCAN_INTERVAL = 10 * 60 * 1000;
   setInterval(scanReleases, SCAN_INTERVAL);
   console.log('Scanner scheduled every 10 minutes');
+  startGrpcServer();
 }
 
 start().catch((err) => {
