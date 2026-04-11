@@ -97,7 +97,7 @@ curl -H "X-API-Key: your-key" \
 | Framework | Express |
 | Database | PostgreSQL (Neon) |
 | Cache | Redis (Upstash) |
-| Email | Nodemailer + Gmail SMTP |
+| Email | Resend (HTTP API) |
 | Tests | Vitest |
 | Lint | ESLint |
 | CI/CD | GitHub Actions |
@@ -171,10 +171,7 @@ PORT=3000
 DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
 REDIS_URL=rediss://default:pass@host:6379
 GITHUB_TOKEN=                  # optional, raises rate limit to 5000/hr
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your@gmail.com
-SMTP_PASS=app-password
+RESEND_API_KEY=re_xxxxxxxxxxxx
 API_KEY=                       # optional, leave empty for public access
 BASE_URL=https://your-domain.com
 ```
