@@ -1,21 +1,14 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 export async function sendConfirmationEmail(email, repo, confirmToken) {
   const confirmUrl = `${BASE_URL}/api/confirm/${confirmToken}`;
 
-  await transporter.sendMail({
-    from: '"Tag Whisperer" <omisoft.github@gmail.com>',
+  await resend.emails.send({
+    from: 'Tag Whisperer <onboarding@resend.dev>',
     to: email,
     subject: `Confirm your subscription to ${repo}`,
     html: `
@@ -30,8 +23,8 @@ export async function sendConfirmationEmail(email, repo, confirmToken) {
 export async function sendReleaseNotification(email, repo, tag, unsubscribeToken) {
   const unsubscribeUrl = `${BASE_URL}/api/unsubscribe/${unsubscribeToken}`;
 
-  await transporter.sendMail({
-    from: '"Tag Whisperer" <omisoft.github@gmail.com>',
+  await resend.emails.send({
+    from: 'Tag Whisperer <onboarding@resend.dev>',
     to: email,
     subject: `New release: ${repo} ${tag}`,
     html: `
