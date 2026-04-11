@@ -186,8 +186,6 @@ Real emails delivered via Gmail SMTP. Confirmation and release notification temp
 
 ![Gmail Confirmation](docs/screenshots/03-gmail-confirmation.png)
 
-![Release Notification](docs/screenshots/11-release-notification.png)
-
 ### Confirmation & Unsubscribe Pages
 
 Browser users see styled HTML pages instead of raw JSON. API consumers (curl, Postman) still receive JSON – the server checks the `Accept` header.
